@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Adapted from original pipeline provided by Marta Ibañez Lligoña
+# Contact: marta.ibanez@vhir.org
+
+## Create multiqc directory
+mkdir -p "/home/sumeyye/Desktop/GBS1_26/results/multiqc"
+
+## put path to multiqc output directory
+MULTIQC_OUT="/home/sumeyye/Desktop/GBS1_26/results/multiqc"
+
+## change to fastqc directory to run multiqc
+cd "/home/sumeyye/Desktop/GBS1_26/results/fastqc"
+
+## run multiqc for all fastqc results
+multiqc --module fastqc . -o $MULTIQC_OUT
