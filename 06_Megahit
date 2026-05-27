@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Adapted from original pipeline provided by Marta Ibañez Lligoña
+# Contact: marta.ibanez@vhir.org
+
+## --- IMPORTANT !!!! ---
+## This script needs to be run with UNZIPPED FASTQ FILES (.fastq)
+## megahit does not accept .fastq.gz files as input
+
+## IMPORTANT:
+## MEGAHIT requires UNZIPPED FASTQ (.fastq), not .fastq.gz
+
+## Path to host-filtered FASTQ files (output of Bowtie2)
+FILTERED_FASTQ_PATH="/home/sumeyye/Desktop/GBS1_26/results/filtered_fastqs"
+
+## Output directory for assemblies
+ASSEMBLY_PATH="/home/sumeyye/Desktop/GBS1_26/results/megahit"
+
+## Create output directory
+mkdir -p "$ASSEMBLY_PATH"
+
+## Unzip FASTQ files if needed
+echo "Checking compressed FASTQ files..."
+gunzip -kf "$FILTERED_FASTQ_PATH"/*.fastq.gz
+
+## Get unique sample names
+FILE_NAMES=$(find "$FILTERED_FASTQ_PATH" -type f -name "*_R1.fastq" \
+  | sed 's/_R1.fastq//' \
+  | sort)
+
+echo "Samples:"
+echo "$FILE_NAMES"
+
+## Run MEGAHIT
+for sample in $FILE_NAMES
+do
+    echo "Running MEGAHIT for: $(basename $sample)"
+
+    in1="${sample}_R1.fastq"
+    in2="${sample}_R2.fastq"
+
+    out="$ASSEMBLY_PATH/$(basename $sample)"
+
+    megahit \
+      -1 "$in1" \
+      -2 "$in2" \
+      -t 6 \
+      -m 0.6 \
+      -o "$out"
+
+    echo "MEGAHIT completed for: $(basename $sample)"
+done
